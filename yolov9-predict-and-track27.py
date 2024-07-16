@@ -76,6 +76,7 @@ def detect(UAV_status):
     # ------------------推理模块-----------------------------------
     start = time.time()
     model = YOLO(weights_path)
+    classes = [i for i in range(9)]
     results = model.track(
         source=rtmp_sub_url,
         #source=source_path,
@@ -88,6 +89,7 @@ def detect(UAV_status):
         # save_txt=True,  # 把结果以txt形式保存
         # save_conf=True,  # 保存置信度得分
         # save_crop=True,  # 保存剪裁的图像
+        classes=classes,  # 忽略’火焰‘和’烟雾‘类别
         conf=0.4,
         iou=0.5,
         device=0,

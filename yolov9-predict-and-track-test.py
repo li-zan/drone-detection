@@ -71,6 +71,7 @@ p_start = time.time()
 # ------------------推理模块-----------------------------------
 start = time.time()
 model = YOLO(weights_path)
+classes = [i for i in range(9)]
 results = model.track(
     source=source_path,
     stream=True,  # 流模式处理，防止因为因为堆积而内存溢出
@@ -81,6 +82,7 @@ results = model.track(
     # vid_stride=2,  # 视频帧数的步长，即隔几帧检测跟踪一次
     # save_txt=True,  # 把结果以txt形式保存
     # save_conf=True,  # 保存置信度得分
+    classes=classes,  # 忽略’火焰‘和’烟雾‘类别
     save_crop=True,  # 保存剪裁的图像
     conf=0.4,
     iou=0.5,
