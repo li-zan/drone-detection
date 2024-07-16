@@ -51,7 +51,7 @@ def generate_objects_location_string(xyxy, cls):
     # 创建最终的字符串，格式为 "类别：坐标1，坐标2 ..."
     result = []
     for class_name, coords in coordinates.items():
-        if coords and class_name not in ['火焰', '烟雾']:  # 忽略‘火焰’和'烟雾'类别
+        if coords:
             result.append(f"{class_name}：{','.join(coords)}")
 
     return ' '.join(result)
