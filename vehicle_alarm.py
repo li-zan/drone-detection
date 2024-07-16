@@ -24,12 +24,12 @@ def vehicle_alarm_last(path, number_info, UAV_status, class_ids_string, objects_
     :param number_info: string，输出当前每个label对应的数量消息，如person：7，helmet：8...
     """
     ch_labels = {0: '人',
-                 1: '重型卡车',
-                 2: '挖掘机',
-                 3: '汽车吊机',
-                 4: '履带吊机',
-                 5: '旋挖钻机',
-                 6: '水泥车'}
+                 3: '重型卡车',
+                 4: '挖掘机',
+                 5: '汽车吊机',
+                 6: '履带吊机',
+                 7: '旋挖钻机',
+                 8: '水泥车'}
 
     # 遍历字典，并在每个迭代中调用 analysis_results_for_QDEQ
     for key, label in ch_labels.items():

@@ -19,8 +19,8 @@ def generate_detailed_statistics_string(class_ids):
     # 统计每个类别的数量
     counts = {class_name: np.sum(class_ids == class_id) for class_id, class_name in class_names.items()}
 
-    # 移除数量为0的类别
-    counts = {class_name: count for class_name, count in counts.items() if count not in [0, 9, 10]}
+    # 移除数量为0的类别,忽略‘火焰’和'烟雾'类别
+    counts = {class_name: count for class_name, count in counts.items() if count > 0 and class_name not in ['火焰', '烟雾']}
 
     # 创建统计字符串，格式为 "\"类别:数量\""
     statistics_lines = ['"' + f'{class_name}:{count}' + '"' for class_name, count in counts.items()]
@@ -50,7 +50,7 @@ def generate_detailed_vehicle_statistics_string(class_ids):
     # 统计每个类别的数量
     counts = {class_name: np.sum(class_ids == class_id) for class_id, class_name in class_names.items()}
 
-    # 移除数量为0的类别
+    # 移除数量为0的类别,忽略‘火焰’和'烟雾'类别
     counts = {class_name: count for class_name, count in counts.items() if count > 0 and class_name not in ['头盔', '救生衣', '火焰', '烟雾']}
 
     # 创建统计字符串，格式为 "\"类别:数量\""
