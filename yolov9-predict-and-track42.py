@@ -5,7 +5,7 @@ import os
 
 from ClassCountFormatter import generate_detailed_statistics_string, generate_detailed_vehicle_statistics_string
 from ObjectLocationFormatter import generate_objects_location_string
-from get_UAV_status27 import get_UAV_status
+from get_UAV_status42 import get_UAV_status
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import time
@@ -53,7 +53,7 @@ def detect(UAV_status):
     tracker = "botsort.yaml"  # 所采用的跟踪算法
     save_directory = "runs/screenshot"  # 异常图片保存路径
     vehicle_directory = "runs/vehicle_screenshot"
-    rtsp_url = 'rtsp://10.14.197.60:8554/video' # RTSP服务器地址
+    # rtsp_url = 'rtsp://10.14.197.60:8554/projectId=42' # RTSP服务器地址
 
     # ----------------参数设置------------------------------------
     # 设置报警帧间隔
@@ -77,24 +77,25 @@ def detect(UAV_status):
     p_start = time.time()
 
     # 初始化FFmpeg推流
-    cap = cv2.VideoCapture(0)
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    command = [
-        'ffmpeg',
-        '-y',
-        '-f', 'rawvideo',
-        '-pix_fmt', 'bgr24',
-        '-s', "{}x{}".format(width, height),
-        '-r', '-',
-        '-c:v', 'libx264',
-        '-pix_fmt', 'yuv420p',
-        '-preset', 'ultrafast',
-        '-f', 'rtsp',
-        rtsp_url
-    ]
-    p = sp.Popen(command, stdin=sp.PIPE)
+    # cap = cv2.VideoCapture(rtmp_sub_url)
+    # fps = int(cap.get(cv2.CAP_PROP_FPS))
+    # width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    # height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    # command = [
+    #     'ffmpeg',
+    #     '-y',
+    #     '-f', 'rawvideo',
+    #     '-pix_fmt', 'bgr24',
+    #     '-s', "{}x{}".format(width, height),
+    #     '-r', str(fps),
+    #     '-i', '-',
+    #     '-c:v', 'libx264',
+    #     '-pix_fmt', 'yuv420p',
+    #     '-preset', 'ultrafast',
+    #     '-f', 'rtsp',
+    #     rtsp_url
+    # ]
+    # p = sp.Popen(command, stdin=sp.PIPE)
 
 
     # ------------------推理模块-----------------------------------
@@ -105,7 +106,7 @@ def detect(UAV_status):
         source=rtmp_sub_url,
         #source=source_path,
         stream=True,  # 流模式处理，防止因为因为堆积而内存溢出
-        show=False,  # 实时推理演示
+        show=True,  # 实时推理演示
         tracker=tracker,  # 默认tracker为botsort
         save=True,
         save_dir=save_path,
@@ -201,7 +202,7 @@ def detect(UAV_status):
                 frame_count = 0
 
         # 将处理后的帧推送到RTSP服务器
-        p.stdin.write(im_array.tobytes())
+        # p.stdin.write(im_array.tobytes())
 
     # ---------------------推理结束调vehicle_alarm接口---------------------
     # 先保存numpy数组格式的图像
@@ -212,7 +213,7 @@ def detect(UAV_status):
     # 保存图像
     cv2.imwrite(_file_path, im_array)  # OpenCV的方法来保存numpy数组格式的图像
     # ---------------------------------------------------------------
-    vehicle_alarm_last(_file_path, count_per_class, UAV_status, class_ids_string, objects_location_string)
+    vehicle_alarm_last(_file_path, count_per_class, UAV_status, None, None)
     # ----------------------------------------------------------------
 
     end = time.time()
@@ -242,9 +243,10 @@ check_rtmp_stream()
 #     UAV_status = {
 #         "data": {
 #             "planId": "1795698421052158000",
-#             "time": "2024-05-29T14:18:32",
+#             "time": "2024-07-10T14:18:32",
 #             "uavRecordId": "1793824235408461800",
-#             "projectId": "28"
+#             "projectId": "28",
+#             "rtmpSubUrl": "E:/videos_for_test/prj49/no_targets.mp4"
 #         }
 #     }
 #     detect(UAV_status)
