@@ -108,10 +108,10 @@ def analysis_results_for_QDEQ(violator_lsnumber, event_type, camera_id, violatio
 if __name__ == "__main__":
     UAV_status = {
         "data": {
-            "planId": "1793585290159018000",
-            "time": "2024-05-24T10:01:38",
-            "uavRecordId": "1793824235408461800",
-            "projectId": "28"
+            "planId": "1792375875246444546",
+            "time": "2024-07-26T10:30:00",
+            "uavRecordId": "1816367780593799168",
+            "projectId": "29"
         }
     }
 
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         "EventType": "{}".format("51"),
         "time": Createtime,
         "CameraID": "{}".format("QDEJ-WRJ"),
-        "ViolationPhoto": "{}".format("/Upload/DroneImage/QDER-WRJ/1715344366_S_20240524113540135.png"),
+        "ViolationPhoto": "{}".format("/Upload/DroneImage/QDER-WRJ/1722168234260_S_20240728203013314.jpg"),
         "T2": 6,  # 插入数据库的时间间隔限制
         "EventDescription": "{}".format(""),
         "ProjectId": "{}".format(project_id),

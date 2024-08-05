@@ -47,7 +47,7 @@ def detect(UAV_status):
     # ----------------路径设置----------------------------------
     source_path = "../DJI_0333.MP4"  # 视频路径
     # weights_path = "best/best1.pt"  # 权重文件路径
-    weights_path = "weights/yolov9c-1280-bathch2-all.pt"
+    weights_path = "weights/yolov9c_TFS-1280-batch4-400e-prj28.pt"
     save_path = "runs"  # 运行结果保存路径
     tracker = "botsort.yaml"  # 所采用的跟踪算法
     save_directory = "runs/screenshot"  # 异常图片保存路径

@@ -59,5 +59,5 @@ def upload_drone_img(img_path, camera_id):
 
 
 if __name__ == "__main__":
-    res = upload_drone_img(img_path="F:/Data cut sets_coco/drone-detection-v3.0_qier/runs/vehicle_screenshot/1715344366.png", camera_id="QDER-WRJ")
+    res = upload_drone_img(img_path="E:/pic_for_test/北六环4标-0726/1722168234260.jpg", camera_id="QDER-WRJ")
     print(res)
