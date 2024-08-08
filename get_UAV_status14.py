@@ -1,6 +1,7 @@
 import requests
 
-url_for_UAV_status = "http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=14"
+# url_for_UAV_status = "http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=14"
+url_for_UAV_status = "http://10.84.11.153:9562/sysapi/Task/GetUAVStatus?projectId=14"
 
 def get_UAV_status():
     response = requests.get(url_for_UAV_status)
