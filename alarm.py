@@ -6,9 +6,14 @@ from drone_video_alarm import analysis_results, analysis_results_for_QDEQ
 def cap_alarm(UAV_status, path, persons=0, helmets=0, class_ids_string="", objects_location_string=""):
     """
     关于未戴安全帽的报警模块
-    :param path: img，必须，某一帧的检测画面
-    :param persons: int，非必须，某一帧检测到的人数
-    :param helmets: int，非必须，某一帧检测到的头盔数
+
+    Args:
+        UAV_status (dict): UAV 飞行信息。
+        path (string): 异常抽检照片存储路径。
+        persons (int):  某一帧检测到的人数。
+        helmets (int): 某一帧检测到的头盔数。
+        class_ids_string (string, optional): 描述当前帧的各个类别的数量，默认为空。
+        objects_location_string (string, optional): 描述类别的位置，默认为空。
     """
     # 判断是否要预警(当前只能通过比较persons和helmets的数目来判断是否有人没戴安全帽,不能精准定位到是哪个人违规了)
     if persons > helmets:

@@ -1,21 +1,18 @@
 import torch
 
-def generate_objects_location_string(xyxy, cls):
+def generate_objects_location_string(xyxy, cls, args):
     """
     根据检测到的对象的边界框坐标和类别（张量格式），生成描述这些对象位置的字符串。
 
-    参数:
-    xyxy : torch.Tensor
-        边界框坐标的二维张量，每行代表一个边界框的左上角和右下角坐标 (x1, y1, x2, y2)。
-    cls : torch.Tensor
-        每个边界框对应的类别ID的一维张量，类别ID范围从0到8。
+    Args:
+        xyxy (torch.Tensor): 边界框坐标的二维张量，每行代表一个边界框的左上角和右下角坐标 (x1, y1, x2, y2)。
+        cls (torch.Tensor): 每个边界框对应的类别ID的一维张量。
 
-    返回:
-    str
-        描述检测到的对象位置的字符串。每个类别的对象位置用中文名称表示，并按照 "(x_center, y_bottom)" 的格式输出。
-        如果同一类别有多个对象，则它们的位置由逗号分隔。未检测到的类别不会出现在字符串中。
+    Returns:
+        (str): 描述检测到的对象位置的字符串。每个类别的对象位置用中文名称表示，并按照 "(x_center, y_bottom)" 的格式输出。
+               如果同一类别有多个对象，则它们的位置由逗号分隔。未检测到的类别不会出现在字符串中。
 
-    示例:
+    Examples:
         cls_example = torch.tensor([0., 1., 0.])
         xyxy_example = torch.tensor([[3051.3687, 744.3865, 3129.1760, 827.1392],
                                          [3092.5938, 744.1696, 3110.1521, 761.4154],

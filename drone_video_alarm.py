@@ -11,18 +11,20 @@ url_for_QDEQ = "http://119.36.93.100:9562/sysapi/Task/AnalysisResult"
 
 def analysis_results(violator_lsnumber, event_type, camera_id, violation_photo, event_description=""):
     """
-    将风险识别的异常报警记录写入到数据库
-    :param violator_lsnumber: string，必须，违规人员ID，未成功识别时输入-1，识别成功时输入人员ID，由接口1获取
-    :param event_type: string，必须，违规事件类型，无人机未戴安全帽：50，无人机识别工程机械和类数量统计：51
-    :param time: DateTime，必须，时间
-    :param camera_id: string，必须，由配置文件输入，测试时输入anJiu1
-    :param violation_photo: string，必须，照片存储路径，由接口3文件服务器接口获得
-    :param id: string，非必须，唯一ID值，不可重复，不输入时由系统自动生成
-    :param event_description: string，非必须，违规事件描述，默认不写，如预置点信息采集则定义为球机或者枪机的预置点位置：，preset point 1，preset point 2，preset point 3
-    :return:
+    将风险识别的异常报警记录写入到数据库，同时将该抽检帧上传至服务器。【简易信息】
+
+    Args:
+        violator_lsnumber (string): 违规人员ID，未成功识别时输入"-1"，识别成功时输入人员ID。
+        event_type (string): 违规事件类型。
+            - 无人机检测未戴安全帽: "50"
+            - 无人机识别工程机械和类数量统计: "51"
+            - 无人机统计人员机械总数: "52"
+        camera_id (string): 由配置文件输入，测试时输入 "anJiu1"。
+        violation_photo (string): 异常抽检照片存储路径。
+        event_description (string, optional): 违规事件描述，默认为空。
     """
 
-    # TODO 将图片上传到文件服务器，数据上传到数据库中
+    # 将图片上传到文件服务器，数据上传到数据库中
     upload_img_status, upload_img_path = upload_drone_img(violation_photo, camera_id)
     # 如果图片上传成功,将数据插入数据库
     if upload_img_status:
@@ -52,19 +54,23 @@ def analysis_results(violator_lsnumber, event_type, camera_id, violation_photo, 
 
 def analysis_results_for_QDEQ(violator_lsnumber, event_type, camera_id, violation_photo, UAV_status, CurrentObject="", CurrentLocation="", event_description=""):
     """
-    将风险识别的异常报警记录写入到数据库
-    :param violator_lsnumber: string，必须，违规人员ID，未成功识别时输入-1，识别成功时输入人员ID，由接口1获取
-    :param event_type: string，必须，违规事件类型，无人机未戴安全帽：50，无人机识别工程机械：51 无人机统计人员机械总数：52
-    :param time: DateTime，必须，时间
-    :param camera_id: string，必须，由配置文件输入，测试时输入anJiu1
-    :param violation_photo: string，必须，照片存储路径，由接口3文件服务器接口获得
-    :param id: string，非必须，唯一ID值，不可重复，不输入时由系统自动生成
-    :param CurrentObject: string，非必须，唯一ID值，描述当前帧的各个类的数量
-    :param event_description: string，非必须，违规事件描述，默认不写，如预置点信息采集则定义为球机或者枪机的预置点位置：，preset point 1，preset point 2，preset point 3
-    :return:
+    将风险识别的异常报警记录写入到数据库，同时将该抽检帧上传至服务器。【详细信息】
+
+    Args:
+        violator_lsnumber (string): 违规人员ID，未成功识别时输入"-1"，识别成功时输入人员ID。
+        event_type (string): 违规事件类型。
+            - 无人机检测未戴安全帽: "50"
+            - 无人机识别工程机械和类数量统计: "51"
+            - 无人机统计人员机械总数: "52"
+        camera_id (string): 由配置文件输入，测试时输入 "anJiu1"。
+        violation_photo (string): 异常抽检照片存储路径。
+        UAV_status (dict): UAV 飞行信息。
+        CurrentObject (string, optional): 描述当前帧的各个类别的数量，默认为空。
+        CurrentLocation (string, optional): 描述类别的位置，默认为空。
+        event_description (string, optional): 违规事件描述，默认为空。
     """
 
-    # TODO 将图片上传到文件服务器，数据上传到数据库中
+    # 将图片上传到文件服务器，数据上传到数据库中
     upload_img_status, upload_img_path = upload_drone_img(violation_photo, camera_id)
     # 如果图片上传成功,将数据插入数据库
     if upload_img_status:
