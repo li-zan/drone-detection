@@ -22,7 +22,7 @@ def vehicle_alarm(path, number_info, UAV_status, class_ids_string, objects_locat
                               event_description=class_ids_string)
 
 
-def vehicle_alarm_last(path, number_info, UAV_status, class_ids_string, objects_location_string):
+def vehicle_alarm_last(path, number_info, UAV_status, class_ids_string, objects_location_string, args):
     """
     关于最后累计人员车辆统计的报警模块
 
@@ -31,15 +31,10 @@ def vehicle_alarm_last(path, number_info, UAV_status, class_ids_string, objects_
         number_info (dict): 累计所有类别与其对应的数量。
         UAV_status (dict): UAV 飞行信息。
         class_ids_string (string, optional): 描述当前帧的人员机械的数量。
-        objects_location_string (string): 描述类别的位置。
+        objects_location_string (string, optional): 描述类别的位置。
+        args: 参数配置。
     """
-    ch_labels = {0: '人',
-                 3: '重型卡车',
-                 4: '挖掘机',
-                 5: '汽车吊机',
-                 6: '履带吊机',
-                 7: '旋挖钻机',
-                 8: '水泥车'}
+    ch_labels = args.person_vehicle_names
 
     # 遍历字典，并在每个迭代中调用 analysis_results_for_QDEQ
     for key, label in ch_labels.items():

@@ -5,7 +5,8 @@ import os
 
 from ClassCountFormatter import generate_detailed_statistics_string, generate_detailed_vehicle_statistics_string
 from ObjectLocationFormatter import generate_objects_location_string
-from get_UAV_status42 import get_UAV_status
+from get_UAV_status import get_UAV_status
+from cfg import CFG, get_cfg
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import time
@@ -16,11 +17,17 @@ import supervision as sv
 import threading
 import numpy as np
 import subprocess as sp
-import torch
 from alarm import cap_alarm
 from ultralytics.models import YOLO
 from draw import test_corner_boxes
 from vehicle_alarm import vehicle_alarm, vehicle_alarm_last
+
+
+# ----------------全局配置项------------------------------------------------
+PROJECT_ID = 42  # 必须指定项目ID
+
+args = get_cfg(cfg=CFG, project_id=PROJECT_ID)  # 加载配置文件参数
+
 
 # ----------------函数（等待放置于相关工具类）----------------------------------
 # 对于每一帧的处理
@@ -48,16 +55,18 @@ def detect(UAV_status):
     # ----------------路径设置----------------------------------
     source_path = "E:/videos_for_test/chengyu0529.mp4"  # 视频路径
     # weights_path = "best/best1.pt"  # 权重文件路径
-    weights_path = "weights/yolov9c_TFS-1280-batch4-400e-prj28.pt"
+    weights_path = args.weights_path
     save_path = "runs"  # 运行结果保存路径
     tracker = "botsort.yaml"  # 所采用的跟踪算法
-    save_directory = "runs/screenshot"  # 异常图片保存路径
-    vehicle_directory = "runs/vehicle_screenshot"
-    # rtsp_url = 'rtsp://10.14.197.60:8554/projectId=42' # RTSP服务器地址
+    save_directory = args.save_directory  # 安全帽抽检帧图片保存路径
+    vehicle_directory = args.vehicle_directory  # 机械车辆抽检帧图片保存路径
+    # rtsp_url = 'rtsp://10.14.197.60:8554/projectId=42'  # RTSP服务器地址
 
     # ----------------参数设置------------------------------------
-    # 设置报警帧间隔
-    alarm_clock = 30
+    # 设置安全帽抽检帧间隔(帧)
+    alarm_clock = args.alarm_clock
+    # 设置人员机械抽检时间间隔(秒)
+    pm_internal = args.pm_internal
     # 设置人数变动阈值
     person_increase_or_decrease = 10
     # 帧计数
@@ -69,11 +78,13 @@ def detect(UAV_status):
     rtmp_sub_url = str(UAV_status["data"]["rtmpSubUrl"])
 
     # ----------------初始化------------------------------------
+    # 检测类别最大数目
+    class_num = len(args.class_names)
     # 每个类别当前的最大ID
-    max_id_per_class = {i: -1 for i in range(11)}  # 假设类别ID范围为0到10
+    max_id_per_class = {i: -1 for i in range(class_num)}
     # 每个类别的计数
-    count_per_class = {i: 0 for i in range(11)}
-    # 用于计时：每隔五秒输出一次各个类的累计数量
+    count_per_class = {i: 0 for i in range(class_num)}
+    # 用于计时：每隔pm_internal(秒)时间抽检当前帧的人员机械数量
     p_start = time.time()
 
     # 初始化FFmpeg推流
@@ -97,16 +108,15 @@ def detect(UAV_status):
     # ]
     # p = sp.Popen(command, stdin=sp.PIPE)
 
-
     # ------------------推理模块-----------------------------------
     start = time.time()
     model = YOLO(weights_path)
-    classes = [i for i in range(9)]
+    # classes = [i for i in range(9)]
     results = model.track(
         source=rtmp_sub_url,
-        #source=source_path,
+        # source=source_path,
         stream=True,  # 流模式处理，防止因为因为堆积而内存溢出
-        show=True,  # 实时推理演示
+        show=False,  # 实时推理演示
         tracker=tracker,  # 默认tracker为botsort
         save=True,
         save_dir=save_path,
@@ -114,7 +124,7 @@ def detect(UAV_status):
         # save_txt=True,  # 把结果以txt形式保存
         # save_conf=True,  # 保存置信度得分
         # save_crop=True,  # 保存剪裁的图像
-        classes=classes,  # 忽略’火焰‘和’烟雾‘类别
+        # classes=classes,  # 忽略’火焰‘和’烟雾‘类别
         conf=0.4,
         iou=0.5,
         device=0,
@@ -122,8 +132,8 @@ def detect(UAV_status):
 
     """
     # result.names输出的class为：
-    # {0: 'person', 1: 'helmet', 2: 'life jacket', 3: 'truck', 4: 'excavator', 、
-    # 5: 'car crane', 6: 'crawler crane', 7: 'rotary drill rig', 8: 'concrete tanker', 9: 'flame', 10: 'smoke'}
+    # {0: 'person', 1: 'helmet', 2: 'life jacket', 3: 'truck', 4: 'excavator',
+    # 5: 'car crane', 6: 'crawler crane', 7: 'rotary drill rig', 8: 'concrete tanker'}
     # 其中 0:person 和 1:helmet 是重点要处理的
     """
 
@@ -135,7 +145,8 @@ def detect(UAV_status):
         probs = r.probs  # Class probabilities for classification outputs
 
         # 得到某一帧的检测结果(转化为PIL图片)
-        im_array = r.plot(conf=False, line_width=1, font_size=1.5)  # plot a BGR numpy array of predictions
+        # ultralytics.engine.results.Results.plot (及相关plotting1...) 源码侵入式修改 画面实时显示统计信息
+        im_array = r.plot(conf=False, line_width=1, font_size=1.5, args=args)  # plot a BGR numpy array of predictions
         # im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
         # im.show()  # show image
         # im.save(det_img_path)  # save image
@@ -150,11 +161,11 @@ def detect(UAV_status):
             # ----------------------------------------------------------------
 
             class_ids = r.boxes.cls.cpu().numpy().astype(int)
-            class_ids_string = generate_detailed_statistics_string(class_ids)
-            class_ids_vehicle_string = generate_detailed_vehicle_statistics_string(class_ids)
-            objects_location_string = generate_objects_location_string(boxes.xyxy, boxes.cls)
+            class_ids_string = generate_detailed_statistics_string(class_ids, args)
+            class_ids_vehicle_string = generate_detailed_vehicle_statistics_string(class_ids, args)
+            objects_location_string = generate_objects_location_string(boxes.xyxy, boxes.cls, args)
 
-            if time.time() - p_start >= 30:
+            if time.time() - p_start >= pm_internal:
                 # ---------------------先保存numpy数组格式的图像--------------------
                 # 形成文件名
                 filename = str(int(time.time())) + ".png"  # 使用当前时间的时间戳（无小数点）
@@ -184,8 +195,9 @@ def detect(UAV_status):
                 # ----------------------处理选框------------------------
 
                 # 得到某一帧的检测结果(转化为PIL图片)
+                # ultralytics.engine.results.Results.plot (及相关plotting1...) 源码侵入式修改 画面实时显示统计信息
                 im_alarm_array = r.plot(conf=False, line_width=1, font_size=1.5,
-                                        vehicle=False)  # plot a BGR numpy array of
+                                        statistics=False, vehicle=False, args=args)  # plot a BGR numpy array of
                 out_img = test_corner_boxes(im_alarm_array, boxes.xywh, boxes.xyxy, boxes.cls, boxes.id, l=5,
                                             is_transparent=True,
                                             draw_type=True, draw_corner=True)
@@ -196,7 +208,7 @@ def detect(UAV_status):
                 cv2.imwrite(file_path, out_img)  # OpenCV的方法来保存numpy数组格式的图像
                 # -----------------------------------------------------
                 person_change_count = 0
-                #print(objects_location_string)
+                print(objects_location_string)
                 cap_alarm(UAV_status, file_path, num_person, num_helmet, class_ids_string, objects_location_string)
                 print("此帧异常检测图片已保存至", file_path, ",并同步上传至数据库。")
                 frame_count = 0
@@ -213,7 +225,7 @@ def detect(UAV_status):
     # 保存图像
     cv2.imwrite(_file_path, im_array)  # OpenCV的方法来保存numpy数组格式的图像
     # ---------------------------------------------------------------
-    vehicle_alarm_last(_file_path, count_per_class, UAV_status, None, None)
+    vehicle_alarm_last(_file_path, count_per_class, UAV_status, None, None, args)
     # ----------------------------------------------------------------
 
     end = time.time()
@@ -222,20 +234,26 @@ def detect(UAV_status):
 
 def check_rtmp_stream():
     while True:
-        uav_status = get_UAV_status()
-        uav_data = uav_status["data"]
-        if uav_data:
-            url = uav_status["data"]["rtmpSubUrl"]
-            if url:
-                print("RTMP stream: " + str(url) + " is available.")
-                detect(uav_status)
-                time.sleep(60)
+        try:
+            uav_status = get_UAV_status(args.UAV_status_url)
+            assert uav_status is not None, f"接口请求异常, 检查接口地址: {args.UAV_status_url}"
+            uav_data = uav_status["data"]
+            if uav_data:
+                url = uav_status["data"]["rtmpSubUrl"]
+                if url:
+                    print("RTMP stream: " + str(url) + " is available.")
+                    detect(uav_status)
+                    time.sleep(60)
+                else:
+                    print("RTMP stream is not available.")
+                    time.sleep(60)
             else:
                 print("RTMP stream is not available.")
                 time.sleep(60)
-        else:
-            print("RTMP stream is not available.")
+        except AssertionError as e:
+            print(e)
             time.sleep(60)
+
 
 check_rtmp_stream()
 

@@ -1,0 +1,59 @@
+# 工程配置文件
+
+# 全局 配置项 ------------------------------------------------------------------------------------------------------------
+model: yolov9c.yaml
+weights_path: weights/yolov9c_TFS-1280-batch4-400e-prj28.pt # 模型权重文件路径
+
+save_directory: runs/screenshot  # 安全帽抽检帧图片保存路径
+vehicle_directory: runs/vehicle_screenshot # 机械车辆抽检帧图片保存路径
+
+alarm_clock: 30  # 设置安全帽抽检帧间隔 默认 30 帧。(单位 帧)
+pm_internal: 30  # "personnel_mechanical_inspection_interval" 人员机械抽检时间间隔 默认 30 秒。(单位 秒)
+
+# 自定义 配置项 ----------------------------------------------------------------------------------------------------------
+# 为具体工程自定义配置项，优先级高于全局配置项
+custom:
+  28:  # 成渝5标
+    weights_path:
+    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=28
+  27:  # 成达万2标
+    weights_path:
+    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=27
+  14:
+    weights_path:
+    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=14
+  29:
+    weights_path:
+    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=29
+  42:
+    weights_path:
+    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=42
+  49:  # 漳汕4标
+    weights_path:
+    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=49
+
+# 类别映射 配置 ----------------------------------------------------------------------------------------------------------
+class_names:
+  0: '人'
+  1: '头盔'
+  2: '救生衣'
+  3: '重型卡车'
+  4: '挖掘机'
+  5: '汽车吊机'
+  6: '履带吊机'
+  7: '旋挖钻机'
+  8: '水泥车'
+
+person_vehicle_names:
+  0: '人'
+  3: '重型卡车'
+  4: '挖掘机'
+  5: '汽车吊机'
+  6: '履带吊机'
+  7: '旋挖钻机'
+  8: '水泥车'
+
+without_vehicle_names:
+  0: '人'
+  1: '头盔'
+  2: '救生衣'

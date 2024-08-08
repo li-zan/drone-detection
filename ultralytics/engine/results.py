@@ -186,9 +186,11 @@ class Results(SimpleClass):
 
     def plot(
         self,
+        args=None,
         conf=True,
         line_width=None,
         font_size=None,
+        statistics=True,
         vehicle=True,
         font="simsun.ttc",
         pil=False,
@@ -208,6 +210,7 @@ class Results(SimpleClass):
         Plots the detection results on an input RGB image. Accepts a numpy array (cv2) or a PIL Image.
 
         Args:
+            args (SimpleNamespace): Deploy system configuration file parameters
             conf (bool): Whether to plot the detection confidence score.
             line_width (float, optional): The line width of the bounding boxes. If None, it is scaled to the image size.
             font_size (float, optional): The font size of the text. If None, it is scaled to the image size.
@@ -224,7 +227,8 @@ class Results(SimpleClass):
             show (bool): Whether to display the annotated image directly.
             save (bool): Whether to save the annotated image to `filename`.
             filename (str): Filename to save image to if save is True.
-            vehicle(bool): Whether to plot on vehicle picture
+            statistics (bool): Whether to plot statistics.
+            vehicle (bool): Whether to plot the vehicle or statistics of vehicle on picture.
 
         Returns:
             (numpy.ndarray): A numpy array of the annotated image.
@@ -243,6 +247,10 @@ class Results(SimpleClass):
                 im.save('results.jpg')  # save image
             ```
         """
+        if args is None:  # 框架自动执行推理过程中 不宜手动传入配置项
+            from cfg import CFG
+            args = CFG
+
         if img is None and isinstance(self.orig_img, torch.Tensor):
             img = (self.orig_img[0].detach().permute(1, 2, 0).contiguous() * 255).to(torch.uint8).cpu().numpy()
 
@@ -279,18 +287,21 @@ class Results(SimpleClass):
             for d in reversed(pred_boxes):
                 c, conf, id = int(d.cls), float(d.conf) if conf else None, None if d.id is None else int(d.id.item())
                 # name = ("" if id is None else f"id:{id} ") + names[c]
-                ch_labels = {0: '人',
-                             1: '头盔',
-                             2: '救生衣',
-                             3: '重型卡车',
-                             4: '挖掘机',
-                             5: '汽车吊机',
-                             6: '履带吊机',
-                             7: '旋挖钻机',
-                             8: '水泥车',
-                             9: '火焰',
-                             10: '烟雾'
-                             }
+                ch_labels = args.class_names if vehicle else args.without_vehicle_names
+                # ch_labels = {0: '人',
+                #              1: '头盔',
+                #              2: '救生衣',
+                #              3: '重型卡车',
+                #              4: '挖掘机',
+                #              5: '汽车吊机',
+                #              6: '履带吊机',
+                #              7: '旋挖钻机',
+                #              8: '水泥车',
+                #              9: '火焰',
+                #              10: '烟雾'
+                #              }
+                if c not in ch_labels:
+                    pass
                 name = ch_labels.get(c)
                 # label = (f"{name} {conf:.2f}" if conf else name) if labels else None
                 label = (f'{name}' if conf else name) if labels else None
@@ -311,25 +322,26 @@ class Results(SimpleClass):
                 annotator.kpts(k, self.orig_shape, radius=kpt_radius, kpt_line=kpt_line)
 
         # Plot statistics
-        if vehicle:
-            labels = {0: '人',
-                      1: '头盔',
-                      2: '救生衣',
-                      3: '重型卡车',
-                      4: '挖掘机',
-                      5: '汽车吊机',
-                      6: '履带吊机',
-                      7: '旋挖钻机',
-                      8: '水泥车',
-                      9: '火焰',
-                      10: '烟雾'
-                      }
+        if statistics:
+            labels = args.class_names if vehicle else args.without_vehicle_names
+            # labels = {0: '人',
+            #           1: '头盔',
+            #           2: '救生衣',
+            #           3: '重型卡车',
+            #           4: '挖掘机',
+            #           5: '汽车吊机',
+            #           6: '履带吊机',
+            #           7: '旋挖钻机',
+            #           8: '水泥车',
+            #           9: '火焰',
+            #           10: '烟雾'
+            #           }
             # 获得每一类的统计数目(以dict字典的形式)
             class_ids = pred_boxes.cls.cpu().numpy().astype(int)
             statistics = {}
-            for i in range(9):
+            for i in range(len(args.class_names)):
                 # 寻找某一帧数目不等于0的类
-                if np.sum(class_ids == i) != 0:
+                if np.sum(class_ids == i) != 0 and i in labels:
                     statistics[labels[i]] = np.sum(class_ids == i)  # 将该类别添加到statistics，形式：中文label：数量
             # 调用plotting内的绘制方法
             annotator.statistics(statistics)

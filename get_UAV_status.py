@@ -1,8 +1,7 @@
 import requests
 
-url_for_UAV_status = "http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=28"
 
-def get_UAV_status():
+def get_UAV_status(url_for_UAV_status):
     response = requests.get(url_for_UAV_status)
 
     if response.status_code == 200:
@@ -21,6 +20,8 @@ def get_UAV_status():
     else:
         print(f"无人机状态获取失败\nError: {response.status_code} - {response.text}")
 
+
 if __name__ == "__main__":
-    url = get_UAV_status()
+    url_for_UAV_status = "http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=28"
+    url = get_UAV_status(url_for_UAV_status)
     print(url)

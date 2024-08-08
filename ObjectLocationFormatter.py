@@ -21,19 +21,7 @@ def generate_objects_location_string(xyxy, cls, args):
         人：（3089.8，827.1）, （1131.0，1166.9） 头盔：（3101.4，761.4）
     """
     # 定义类别对应的中文名
-    class_names = {
-        0: '人',
-        1: '头盔',
-        2: '救生衣',
-        3: '重型卡车',
-        4: '挖掘机',
-        5: '汽车吊机',
-        6: '履带吊机',
-        7: '旋挖钻机',
-        8: '水泥车',
-        9: '火焰',
-        10: '烟雾'
-    }
+    class_names = args.class_names
 
     # 初始化存储每个类别坐标的字典
     coordinates = {class_name: [] for class_name in class_names.values()}
