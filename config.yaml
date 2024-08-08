@@ -15,22 +15,22 @@ pm_internal: 30  # "personnel_mechanical_inspection_interval" 人员机械抽检
 custom:
   28:  # 成渝5标
     weights_path:
-    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=28
+    UAV_status_url: http://10.84.11.153:9562/sysapi/Task/GetUAVStatus?projectId=28
   27:  # 成达万2标
     weights_path:
-    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=27
+    UAV_status_url: http://10.84.11.153:9562/sysapi/Task/GetUAVStatus?projectId=27
   14:
     weights_path:
-    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=14
+    UAV_status_url: http://10.84.11.153:9562/sysapi/Task/GetUAVStatus?projectId=14
   29:
     weights_path:
-    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=29
+    UAV_status_url: http://10.84.11.153:9562/sysapi/Task/GetUAVStatus?projectId=29
   42:
     weights_path:
-    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=42
+    UAV_status_url: http://10.84.11.153:9562/sysapi/Task/GetUAVStatus?projectId=42
   49:  # 漳汕4标
     weights_path:
-    UAV_status_url: http://119.36.93.100:9562/sysapi/Task/GetUAVStatus?projectId=49
+    UAV_status_url: http://10.84.11.153:9562/sysapi/Task/GetUAVStatus?projectId=49
 
 # 类别映射 配置 ----------------------------------------------------------------------------------------------------------
 class_names:
