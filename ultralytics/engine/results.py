@@ -301,7 +301,7 @@ class Results(SimpleClass):
                 #              10: '烟雾'
                 #              }
                 if c not in ch_labels:
-                    pass
+                    continue
                 name = ch_labels.get(c)
                 # label = (f"{name} {conf:.2f}" if conf else name) if labels else None
                 label = (f'{name}' if conf else name) if labels else None
